@@ -1,24 +1,44 @@
 import { useEffect, useState } from "react";
 import { Footprints } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { healthKitService } from "@/lib/healthKit";
 
 export function StepCounter() {
   const [steps, setSteps] = useState(0);
   const [isSupported, setIsSupported] = useState(false);
 
   useEffect(() => {
-    // Check if device motion is supported
-    if ('Accelerometer' in window || 'DeviceMotionEvent' in window) {
-      setIsSupported(true);
+    // Query today's steps from HealthKit
+    const fetchTodaySteps = async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const now = new Date();
       
-      // For demo purposes, simulate step counting
-      // In production, this would use actual device sensors
-      const interval = setInterval(() => {
-        setSteps(prev => prev + Math.floor(Math.random() * 3));
-      }, 5000);
+      const todaySteps = await healthKitService.querySteps(today, now);
+      if (todaySteps !== null) {
+        setSteps(todaySteps);
+        setIsSupported(true);
+      }
+    };
 
-      return () => clearInterval(interval);
-    }
+    fetchTodaySteps();
+
+    // Start monitoring for real-time updates
+    let monitorId: string;
+    healthKitService.startMonitoring((data) => {
+      if (data.steps) {
+        setSteps(prev => prev + data.steps);
+        setIsSupported(true);
+      }
+    }).then(id => {
+      monitorId = id;
+    });
+
+    return () => {
+      if (monitorId) {
+        healthKitService.stopMonitoring(monitorId);
+      }
+    };
   }, []);
 
   return (
@@ -45,7 +65,15 @@ export function StepCounter() {
 
         {!isSupported && (
           <div className="bg-muted/50 rounded-lg p-3 text-sm text-center text-muted-foreground">
-            Step counting requires device motion sensors or Apple Watch connection
+            {healthKitService.getPlatform() === 'ios' 
+              ? 'Authorize HealthKit access to track steps' 
+              : 'Step counting requires iOS device. Showing simulated data.'}
+          </div>
+        )}
+        
+        {isSupported && healthKitService.isHealthKitAvailable() && (
+          <div className="bg-success/10 rounded-lg p-2 text-xs text-center text-success font-medium">
+            ✓ Synced with Apple Health
           </div>
         )}
       </div>

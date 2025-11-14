@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { activityStore, type ActivitySession } from "@/lib/activityStore";
 import { calculateMAF, getHeartRateZone } from "@/lib/mafCalculator";
+import { healthKitService } from "@/lib/healthKit";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -15,6 +16,8 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
   const [heartRate, setHeartRate] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [timeInMAF, setTimeInMAF] = useState(0);
+  const [monitorId, setMonitorId] = useState<string | null>(null);
+  const [workoutStartSteps, setWorkoutStartSteps] = useState(0);
 
   const userProfile = activityStore.getUserProfile();
   const mafResult = userProfile ? calculateMAF(
@@ -29,29 +32,38 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
       interval = setInterval(() => {
         setDuration(prev => prev + 1);
         
-        // Simulate step counting
-        if (Math.random() > 0.7) {
-          setSteps(prev => prev + 1);
-        }
-        
-        // Simulate heart rate
-        const simulatedHR = 70 + Math.floor(Math.random() * 50);
-        setHeartRate(simulatedHR);
-        
         // Track time in MAF zone
-        if (mafResult && simulatedHR >= mafResult.minHeartRate && simulatedHR <= mafResult.maxHeartRate) {
+        if (mafResult && heartRate && heartRate >= mafResult.minHeartRate && heartRate <= mafResult.maxHeartRate) {
           setTimeInMAF(prev => prev + 1);
         }
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isActive, isPaused, mafResult]);
+  }, [isActive, isPaused, mafResult, heartRate]);
 
-  const startWorkout = () => {
+  const startWorkout = async () => {
     setIsActive(true);
     setIsPaused(false);
     setStartTime(Date.now());
-    toast.success("Workout started!");
+    
+    // Get current step count to track workout steps
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentSteps = await healthKitService.querySteps(today, new Date());
+    setWorkoutStartSteps(currentSteps || 0);
+    
+    // Start HealthKit monitoring
+    const id = await healthKitService.startMonitoring((data) => {
+      if (data.heartRate) {
+        setHeartRate(data.heartRate);
+      }
+      if (data.steps) {
+        setSteps(prev => prev + data.steps);
+      }
+    });
+    setMonitorId(id);
+    
+    toast.success("Workout started! HealthKit monitoring active.");
   };
 
   const pauseWorkout = () => {
@@ -59,23 +71,44 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
     toast.info(isPaused ? "Workout resumed" : "Workout paused");
   };
 
-  const stopWorkout = () => {
+  const stopWorkout = async () => {
     if (!startTime) return;
+
+    // Stop HealthKit monitoring
+    if (monitorId) {
+      healthKitService.stopMonitoring(monitorId);
+    }
+
+    const endTime = Date.now();
+    const workoutDuration = Math.floor(duration / 60);
+    const workoutDistance = steps * 0.000762;
+
+    // Save workout to HealthKit
+    if (healthKitService.isHealthKitAvailable()) {
+      await healthKitService.saveWorkout({
+        type: 'walking',
+        startDate: new Date(startTime),
+        endDate: new Date(endTime),
+        duration: workoutDuration,
+        distance: workoutDistance,
+        averageHeartRate: heartRate || undefined,
+      });
+    }
 
     const session: ActivitySession = {
       id: `${Date.now()}`,
       date: new Date().toISOString(),
       startTime,
-      endTime: Date.now(),
-      duration: Math.floor(duration / 60),
+      endTime,
+      duration: workoutDuration,
       steps,
-      distance: steps * 0.000762, // Average step length in km
+      distance: workoutDistance,
       avgHeartRate: heartRate || undefined,
       timeInMAFZone: Math.floor(timeInMAF / 60),
     };
 
     activityStore.saveActivity(session);
-    toast.success("Workout saved!");
+    toast.success("Workout saved to app and Apple Health!");
     
     // Reset
     setIsActive(false);
@@ -84,6 +117,7 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
     setHeartRate(null);
     setTimeInMAF(0);
     setStartTime(null);
+    setMonitorId(null);
     
     onBack();
   };

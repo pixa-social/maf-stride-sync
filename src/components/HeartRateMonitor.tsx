@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { type MAFResult, getHeartRateZone } from "@/lib/mafCalculator";
 import { cn } from "@/lib/utils";
+import { healthKitService } from "@/lib/healthKit";
 
 interface HeartRateMonitorProps {
   mafResult: MAFResult | null;
@@ -11,17 +12,34 @@ interface HeartRateMonitorProps {
 export function HeartRateMonitor({ mafResult }: HeartRateMonitorProps) {
   const [heartRate, setHeartRate] = useState<number | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [platform, setPlatform] = useState('web');
 
   useEffect(() => {
-    // Simulate heart rate for demo
-    // In production, this connects to Apple Watch/HealthKit
-    const interval = setInterval(() => {
-      const simulatedHR = 65 + Math.floor(Math.random() * 40);
-      setHeartRate(simulatedHR);
-      setIsConnected(true);
-    }, 2000);
+    setPlatform(healthKitService.getPlatform());
+    
+    // Request HealthKit authorization on mount
+    healthKitService.requestAuthorization().then(authorized => {
+      if (authorized) {
+        setIsConnected(true);
+      }
+    });
 
-    return () => clearInterval(interval);
+    // Start monitoring heart rate
+    let monitorId: string;
+    healthKitService.startMonitoring((data) => {
+      if (data.heartRate) {
+        setHeartRate(data.heartRate);
+        setIsConnected(true);
+      }
+    }).then(id => {
+      monitorId = id;
+    });
+
+    return () => {
+      if (monitorId) {
+        healthKitService.stopMonitoring(monitorId);
+      }
+    };
   }, []);
 
   const zone = heartRate && mafResult ? getHeartRateZone(heartRate, mafResult) : null;
@@ -100,7 +118,15 @@ export function HeartRateMonitor({ mafResult }: HeartRateMonitorProps) {
 
         {!isConnected && (
           <div className="bg-muted/50 rounded-lg p-3 text-sm text-center text-muted-foreground">
-            Connect Apple Watch for live heart rate monitoring
+            {platform === 'ios' 
+              ? 'Authorize HealthKit access in Settings to connect' 
+              : 'HealthKit only available on iOS devices. Showing simulated data.'}
+          </div>
+        )}
+        
+        {isConnected && healthKitService.isHealthKitAvailable() && (
+          <div className="bg-success/10 rounded-lg p-2 text-xs text-center text-success font-medium">
+            ✓ Connected to Apple Health
           </div>
         )}
       </div>
