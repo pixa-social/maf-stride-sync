@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, Save, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { activityStore, type UserProfile } from "@/lib/activityStore";
 import { calculateMAF } from "@/lib/mafCalculator";
+import { healthKitService } from "@/lib/healthKit";
 import { toast } from "sonner";
 
 export function SettingsView({ onBack }: { onBack: () => void }) {
@@ -16,12 +17,17 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
     healthStatus: 'healthy',
     dailyStepGoal: 10000,
   });
+  const [healthKitConnected, setHealthKitConnected] = useState(false);
+  const [platform, setPlatform] = useState('web');
 
   useEffect(() => {
     const saved = activityStore.getUserProfile();
     if (saved) {
       setProfile(saved);
     }
+    
+    setPlatform(healthKitService.getPlatform());
+    setHealthKitConnected(healthKitService.isHealthKitAvailable());
   }, []);
 
   const mafResult = calculateMAF(profile.age, profile.fitnessLevel, profile.healthStatus);
@@ -30,6 +36,16 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
     activityStore.saveUserProfile(profile);
     toast.success("Profile saved successfully!");
     onBack();
+  };
+
+  const handleConnectHealthKit = async () => {
+    const authorized = await healthKitService.requestAuthorization();
+    if (authorized) {
+      setHealthKitConnected(true);
+      toast.success("HealthKit connected successfully!");
+    } else {
+      toast.error("Failed to connect to HealthKit. Please check permissions in Settings.");
+    }
   };
 
   return (
@@ -160,19 +176,74 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
         {/* Device Connection */}
         <Card className="bg-gradient-card border-0 shadow-soft p-6">
           <h2 className="text-xl font-bold mb-4">Device Connections</h2>
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start" disabled>
-              <span className="flex-1 text-left">Apple Watch</span>
-              <span className="text-sm text-muted-foreground">Not Connected</span>
-            </Button>
-            <Button variant="outline" className="w-full justify-start" disabled>
-              <span className="flex-1 text-left">Apple Health</span>
-              <span className="text-sm text-muted-foreground">Not Connected</span>
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            Device sync requires Capacitor setup with HealthKit integration. This enables real-time heart rate monitoring and step tracking from Apple Watch.
-          </p>
+          
+          {platform === 'ios' ? (
+            <div className="space-y-3">
+              <div className={`flex items-center justify-between p-4 rounded-lg border ${
+                healthKitConnected ? 'bg-success/10 border-success' : 'bg-muted/50 border-border'
+              }`}>
+                <div className="flex items-center gap-3">
+                  {healthKitConnected && <CheckCircle2 className="h-5 w-5 text-success" />}
+                  <div>
+                    <p className="font-medium">Apple Health</p>
+                    <p className="text-sm text-muted-foreground">
+                      {healthKitConnected ? 'Connected & Syncing' : 'Not Connected'}
+                    </p>
+                  </div>
+                </div>
+                {!healthKitConnected && (
+                  <Button onClick={handleConnectHealthKit} size="sm">
+                    Connect
+                  </Button>
+                )}
+              </div>
+              
+              <div className={`flex items-center justify-between p-4 rounded-lg border ${
+                healthKitConnected ? 'bg-success/10 border-success' : 'bg-muted/50 border-border'
+              }`}>
+                <div className="flex items-center gap-3">
+                  {healthKitConnected && <CheckCircle2 className="h-5 w-5 text-success" />}
+                  <div>
+                    <p className="font-medium">Apple Watch</p>
+                    <p className="text-sm text-muted-foreground">
+                      {healthKitConnected ? 'Synced via Apple Health' : 'Not Connected'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {healthKitConnected && (
+                <div className="bg-primary-light rounded-lg p-4">
+                  <p className="text-sm font-medium mb-2">✓ HealthKit Features Enabled:</p>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Real-time heart rate monitoring</li>
+                    <li>• Automatic step counting</li>
+                    <li>• Distance tracking</li>
+                    <li>• Workout data sync</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="bg-muted/50 rounded-lg p-4 text-center">
+                <p className="text-sm text-muted-foreground mb-2">
+                  HealthKit is only available on iOS devices
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Current platform: {platform}
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                To use Apple Watch and HealthKit features, you need to:
+              </p>
+              <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                <li>Export project to GitHub</li>
+                <li>Build the app with Capacitor</li>
+                <li>Run on a real iOS device</li>
+              </ol>
+            </div>
+          )}
         </Card>
 
         {/* Save Button */}
