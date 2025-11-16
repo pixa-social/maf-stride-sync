@@ -129,6 +129,37 @@ export const activityStore = {
     return stats.filter(s => s.date >= monthAgoStr).sort((a, b) => a.date.localeCompare(b.date));
   },
 
+  // Calculate current streak
+  getCurrentStreak(): number {
+    const stats = this.getAllDailyStats().sort((a, b) => b.date.localeCompare(a.date));
+    if (stats.length === 0) return 0;
+
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < stats.length; i++) {
+      const expectedDate = new Date(today);
+      expectedDate.setDate(today.getDate() - i);
+      const expectedDateStr = expectedDate.toISOString().split('T')[0];
+
+      const dayStat = stats.find(s => s.date === expectedDateStr);
+      
+      // Only count days with activities
+      if (dayStat && dayStat.sessions.length > 0) {
+        streak++;
+      } else if (i === 0 && !dayStat) {
+        // Today hasn't started yet, check yesterday
+        continue;
+      } else {
+        // Streak broken
+        break;
+      }
+    }
+
+    return streak;
+  },
+
   // Clear data
   clearAllData() {
     localStorage.removeItem(ACTIVITIES_KEY);

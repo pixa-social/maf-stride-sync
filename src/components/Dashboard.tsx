@@ -12,11 +12,13 @@ type ViewType = 'dashboard' | 'calendar' | 'workout' | 'settings';
 export function Dashboard({ onNavigate }: { onNavigate: (view: ViewType) => void }) {
   const [todayStats, setTodayStats] = useState<DailyStats | null>(null);
   const [userProfile, setUserProfile] = useState(activityStore.getUserProfile());
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     const stats = activityStore.getDailyStats(today);
     setTodayStats(stats);
+    setStreak(activityStore.getCurrentStreak());
   }, []);
 
   const mafResult = userProfile ? calculateMAF(
@@ -60,7 +62,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (view: ViewType) => void
                 <p className="text-sm text-muted-foreground">Maximum Aerobic Function</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Target Range</p>
                 <p className="text-2xl font-bold text-primary">{mafResult.zone}</p>
@@ -69,6 +71,12 @@ export function Dashboard({ onNavigate }: { onNavigate: (view: ViewType) => void
                 <p className="text-sm text-muted-foreground">Time in Zone Today</p>
                 <p className="text-2xl font-bold text-secondary">
                   {todayStats?.timeInMAFZone || 0} min
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Day Streak</p>
+                <p className="text-2xl font-bold text-accent">
+                  {streak} {streak === 1 ? 'day' : 'days'}
                 </p>
               </div>
             </div>
