@@ -66,6 +66,9 @@ export default {
       transitionTimingFunction: {
         'smooth': 'var(--transition-smooth)',
       },
+      padding: {
+        'safe': 'env(safe-area-inset-bottom)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

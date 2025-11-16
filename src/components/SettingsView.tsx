@@ -49,66 +49,66 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero p-4 md:p-6">
-      <div className="mx-auto max-w-2xl space-y-6">
+    <div className="min-h-screen bg-gradient-hero px-4 py-6 pb-safe">
+      <div className="mx-auto max-w-2xl space-y-4">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ChevronLeft className="h-5 w-5" />
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={onBack} className="min-w-[44px]">
+            <ChevronLeft className="h-6 w-6" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground">Configure your profile</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Settings</h1>
+            <p className="text-sm text-muted-foreground">Configure your profile</p>
           </div>
         </div>
 
         {/* Profile Settings */}
-        <Card className="bg-gradient-card border-0 shadow-soft p-6">
-          <h2 className="text-xl font-bold mb-6">Personal Information</h2>
+        <Card className="bg-gradient-card border-0 shadow-soft p-5 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Personal Information</h2>
           
           <div className="space-y-4">
             <div>
-              <Label htmlFor="age">Age</Label>
+              <Label htmlFor="age" className="text-sm">Age</Label>
               <Input
                 id="age"
                 type="number"
                 value={profile.age}
                 onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) || 0 })}
-                className="mt-1"
+                className="mt-1.5 h-12"
               />
             </div>
 
             <div>
-              <Label htmlFor="weight">Weight (kg)</Label>
+              <Label htmlFor="weight" className="text-sm">Weight (kg)</Label>
               <Input
                 id="weight"
                 type="number"
                 value={profile.weight || ''}
                 onChange={(e) => setProfile({ ...profile, weight: parseFloat(e.target.value) || undefined })}
-                className="mt-1"
+                className="mt-1.5 h-12"
                 placeholder="Optional"
               />
             </div>
 
             <div>
-              <Label htmlFor="height">Height (cm)</Label>
+              <Label htmlFor="height" className="text-sm">Height (cm)</Label>
               <Input
                 id="height"
                 type="number"
                 value={profile.height || ''}
                 onChange={(e) => setProfile({ ...profile, height: parseFloat(e.target.value) || undefined })}
-                className="mt-1"
+                className="mt-1.5 h-12"
                 placeholder="Optional"
               />
             </div>
 
             <div>
-              <Label htmlFor="fitness">Fitness Level</Label>
+              <Label htmlFor="fitness" className="text-sm">Fitness Level</Label>
               <Select
                 value={profile.fitnessLevel}
                 onValueChange={(value: any) => setProfile({ ...profile, fitnessLevel: value })}
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1.5 h-12">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -121,12 +121,12 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
             </div>
 
             <div>
-              <Label htmlFor="health">Health Status</Label>
+              <Label htmlFor="health" className="text-sm">Health Status</Label>
               <Select
                 value={profile.healthStatus}
                 onValueChange={(value: any) => setProfile({ ...profile, healthStatus: value })}
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1.5 h-12">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -139,43 +139,43 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
             </div>
 
             <div>
-              <Label htmlFor="stepGoal">Daily Step Goal</Label>
+              <Label htmlFor="stepGoal" className="text-sm">Daily Step Goal</Label>
               <Input
                 id="stepGoal"
                 type="number"
                 value={profile.dailyStepGoal}
                 onChange={(e) => setProfile({ ...profile, dailyStepGoal: parseInt(e.target.value) || 0 })}
-                className="mt-1"
+                className="mt-1.5 h-12"
               />
             </div>
           </div>
         </Card>
 
         {/* MAF Zone Preview */}
-        <Card className="bg-gradient-card border-0 shadow-soft p-6">
-          <h2 className="text-xl font-bold mb-4">Your MAF Zone</h2>
-          <div className="grid grid-cols-2 gap-4">
+        <Card className="bg-gradient-card border-0 shadow-soft p-5 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Your MAF Zone</h2>
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Base MAF</p>
-              <p className="text-2xl font-bold">{mafResult.baseMAF} bpm</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Base MAF</p>
+              <p className="text-xl md:text-2xl font-bold">{mafResult.baseMAF} bpm</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Adjusted MAF</p>
-              <p className="text-2xl font-bold text-primary">{mafResult.adjustedMAF} bpm</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Adjusted MAF</p>
+              <p className="text-xl md:text-2xl font-bold text-primary">{mafResult.adjustedMAF} bpm</p>
             </div>
             <div className="col-span-2">
-              <p className="text-sm text-muted-foreground">Training Zone</p>
-              <p className="text-3xl font-bold text-success">{mafResult.zone}</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Training Zone</p>
+              <p className="text-2xl md:text-3xl font-bold text-success">{mafResult.zone}</p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
+          <p className="text-xs md:text-sm text-muted-foreground mt-4">
             Your MAF zone is calculated using the 180 Formula with adjustments based on your fitness level and health status.
           </p>
         </Card>
 
         {/* Device Connection */}
-        <Card className="bg-gradient-card border-0 shadow-soft p-6">
-          <h2 className="text-xl font-bold mb-4">Device Connections</h2>
+        <Card className="bg-gradient-card border-0 shadow-soft p-5 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Device Connections</h2>
           
           {platform === 'ios' ? (
             <div className="space-y-3">
@@ -185,14 +185,14 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
                 <div className="flex items-center gap-3">
                   {healthKitConnected && <CheckCircle2 className="h-5 w-5 text-success" />}
                   <div>
-                    <p className="font-medium">Apple Health</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm md:text-base font-medium">Apple Health</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
                       {healthKitConnected ? 'Connected & Syncing' : 'Not Connected'}
                     </p>
                   </div>
                 </div>
                 {!healthKitConnected && (
-                  <Button onClick={handleConnectHealthKit} size="sm">
+                  <Button onClick={handleConnectHealthKit} size="sm" className="h-10">
                     Connect
                   </Button>
                 )}
@@ -204,8 +204,8 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
                 <div className="flex items-center gap-3">
                   {healthKitConnected && <CheckCircle2 className="h-5 w-5 text-success" />}
                   <div>
-                    <p className="font-medium">Apple Watch</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm md:text-base font-medium">Apple Watch</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
                       {healthKitConnected ? 'Synced via Apple Health' : 'Not Connected'}
                     </p>
                   </div>
@@ -215,7 +215,7 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
               {healthKitConnected && (
                 <div className="bg-primary-light rounded-lg p-4">
                   <p className="text-sm font-medium mb-2">✓ HealthKit Features Enabled:</p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
+                  <ul className="text-xs md:text-sm text-muted-foreground space-y-1">
                     <li>• Real-time heart rate monitoring</li>
                     <li>• Automatic step counting</li>
                     <li>• Distance tracking</li>
@@ -227,17 +227,17 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
           ) : (
             <div className="space-y-3">
               <div className="bg-muted/50 rounded-lg p-4 text-center">
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-xs md:text-sm text-muted-foreground mb-2">
                   HealthKit is only available on iOS devices
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Current platform: {platform}
                 </p>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 To use Apple Watch and HealthKit features, you need to:
               </p>
-              <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+              <ol className="text-xs md:text-sm text-muted-foreground space-y-1 list-decimal list-inside">
                 <li>Export project to GitHub</li>
                 <li>Build the app with Capacitor</li>
                 <li>Run on a real iOS device</li>
@@ -249,7 +249,7 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
         {/* Save Button */}
         <Button 
           size="lg" 
-          className="w-full bg-gradient-primary shadow-glow"
+          className="w-full bg-gradient-primary shadow-glow h-14"
           onClick={handleSave}
         >
           <Save className="mr-2 h-5 w-5" />
