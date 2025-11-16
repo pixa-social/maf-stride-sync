@@ -140,25 +140,25 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero p-4 md:p-6">
-      <div className="mx-auto max-w-2xl space-y-6">
+    <div className="min-h-screen bg-gradient-hero px-4 py-6 pb-safe">
+      <div className="mx-auto max-w-2xl space-y-4">
         {/* Timer Display */}
-        <Card className="bg-gradient-card border-0 shadow-soft p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-6xl font-bold mb-2">{formatTime(duration)}</h2>
-            <p className="text-muted-foreground">
+        <Card className="bg-gradient-card border-0 shadow-soft p-6">
+          <div className="text-center mb-6">
+            <h2 className="text-5xl md:text-6xl font-bold mb-2">{formatTime(duration)}</h2>
+            <p className="text-sm text-muted-foreground">
               {!isActive ? "Ready to start" : isPaused ? "Paused" : "Workout in progress"}
             </p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 mb-5">
             <div className="bg-primary-light rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Footprints className="h-4 w-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Steps</span>
+                <span className="text-xs text-muted-foreground">Steps</span>
               </div>
-              <p className="text-3xl font-bold text-primary">{steps.toLocaleString()}</p>
+              <p className="text-2xl md:text-3xl font-bold text-primary">{steps.toLocaleString()}</p>
             </div>
 
             <div className="bg-destructive/10 rounded-xl p-4">
@@ -167,23 +167,23 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
                   "h-4 w-4 text-destructive",
                   isActive && !isPaused && "animate-pulse"
                 )} />
-                <span className="text-sm text-muted-foreground">Heart Rate</span>
+                <span className="text-xs text-muted-foreground">Heart Rate</span>
               </div>
-              <p className={cn("text-3xl font-bold", getZoneColor())}>
+              <p className={cn("text-2xl md:text-3xl font-bold", getZoneColor())}>
                 {heartRate || '--'} {heartRate && 'bpm'}
               </p>
             </div>
 
             <div className="bg-secondary-light rounded-xl p-4">
-              <span className="text-sm text-muted-foreground">Distance</span>
-              <p className="text-2xl font-bold text-secondary mt-1">
+              <span className="text-xs text-muted-foreground">Distance</span>
+              <p className="text-xl md:text-2xl font-bold text-secondary mt-1">
                 {(steps * 0.000762).toFixed(2)} km
               </p>
             </div>
 
             <div className="bg-success/10 rounded-xl p-4">
-              <span className="text-sm text-muted-foreground">MAF Time</span>
-              <p className="text-2xl font-bold text-success mt-1">
+              <span className="text-xs text-muted-foreground">MAF Time</span>
+              <p className="text-xl md:text-2xl font-bold text-success mt-1">
                 {Math.floor(timeInMAF / 60)} min
               </p>
             </div>
@@ -191,8 +191,8 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
 
           {/* MAF Zone Indicator */}
           {mafResult && heartRate && (
-            <div className="bg-muted/50 rounded-xl p-4 mb-6">
-              <p className="text-sm font-medium mb-2">MAF Zone Status</p>
+            <div className="bg-muted/50 rounded-xl p-4 mb-5">
+              <p className="text-xs font-medium mb-2">MAF Zone Status</p>
               <div className="relative w-full h-2 bg-muted rounded-full overflow-hidden">
                 <div className="absolute inset-y-0 left-0 w-1/3 bg-primary/30" />
                 <div className="absolute inset-y-0 left-1/3 w-1/3 bg-success/30" />
@@ -217,7 +217,7 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
             {!isActive ? (
               <Button 
                 size="lg" 
-                className="flex-1 bg-gradient-primary shadow-glow"
+                className="flex-1 bg-gradient-primary shadow-glow h-14"
                 onClick={startWorkout}
               >
                 <Play className="mr-2 h-5 w-5" />
@@ -228,7 +228,7 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 h-14"
                   onClick={pauseWorkout}
                 >
                   {isPaused ? <Play className="mr-2 h-5 w-5" /> : <Pause className="mr-2 h-5 w-5" />}
@@ -237,7 +237,7 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
                 <Button 
                   size="lg" 
                   variant="destructive"
-                  className="flex-1"
+                  className="flex-1 h-14"
                   onClick={stopWorkout}
                 >
                   <Square className="mr-2 h-5 w-5" />
@@ -249,7 +249,7 @@ export function WorkoutSession({ onBack }: { onBack: () => void }) {
         </Card>
 
         {!isActive && (
-          <Button variant="ghost" className="w-full" onClick={onBack}>
+          <Button variant="ghost" className="w-full h-12" onClick={onBack}>
             Back to Dashboard
           </Button>
         )}

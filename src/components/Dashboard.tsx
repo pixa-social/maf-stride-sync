@@ -32,50 +32,50 @@ export function Dashboard({ onNavigate }: { onNavigate: (view: ViewType) => void
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-hero p-4 md:p-6">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="min-h-screen bg-gradient-hero px-4 py-6 pb-safe">
+      <div className="mx-auto max-w-2xl space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">MAF Walking</h1>
-            <p className="text-muted-foreground">Train smarter, walk better</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">MAF Walking</h1>
+            <p className="text-sm text-muted-foreground">Train smarter, walk better</p>
           </div>
           <Button 
             variant="ghost" 
             size="icon"
             onClick={() => onNavigate('settings')}
-            className="hover:bg-primary-light"
+            className="hover:bg-primary-light min-w-[44px]"
           >
-            <Settings className="h-5 w-5" />
+            <Settings className="h-6 w-6" />
           </Button>
         </div>
 
         {/* MAF Zone Card */}
         {mafResult && (
-          <Card className="bg-gradient-card border-0 shadow-soft p-6">
+          <Card className="bg-gradient-card border-0 shadow-soft p-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-xl bg-gradient-primary p-3">
-                <Target className="h-6 w-6 text-primary-foreground" />
+              <div className="rounded-xl bg-gradient-primary p-2.5">
+                <Target className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Your MAF Zone</h2>
-                <p className="text-sm text-muted-foreground">Maximum Aerobic Function</p>
+                <h2 className="text-base font-semibold">Your MAF Zone</h2>
+                <p className="text-xs text-muted-foreground">Maximum Aerobic Function</p>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div>
-                <p className="text-sm text-muted-foreground">Target Range</p>
-                <p className="text-2xl font-bold text-primary">{mafResult.zone}</p>
+                <p className="text-xs text-muted-foreground mb-1">Target Range</p>
+                <p className="text-xl font-bold text-primary">{mafResult.zone}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Time in Zone Today</p>
-                <p className="text-2xl font-bold text-secondary">
+                <p className="text-xs text-muted-foreground mb-1">Time Today</p>
+                <p className="text-xl font-bold text-secondary">
                   {todayStats?.timeInMAFZone || 0} min
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Day Streak</p>
-                <p className="text-2xl font-bold text-accent">
+                <p className="text-xs text-muted-foreground mb-1">Streak</p>
+                <p className="text-xl font-bold text-accent">
                   {streak} {streak === 1 ? 'day' : 'days'}
                 </p>
               </div>
@@ -84,69 +84,69 @@ export function Dashboard({ onNavigate }: { onNavigate: (view: ViewType) => void
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           {/* Steps */}
-          <Card className="bg-gradient-card border-0 shadow-soft p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <Card className="bg-gradient-card border-0 shadow-soft p-5">
+            <div className="flex items-center gap-2.5 mb-3">
               <div className="rounded-xl bg-primary-light p-2">
-                <Activity className="h-5 w-5 text-primary" />
+                <Activity className="h-4 w-4 text-primary" />
               </div>
-              <h3 className="font-semibold">Steps Today</h3>
+              <h3 className="font-semibold text-sm">Steps Today</h3>
             </div>
             <p className="text-3xl font-bold mb-2">{todayStats?.totalSteps.toLocaleString() || 0}</p>
-            <div className="w-full bg-muted rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2.5">
               <div 
-                className="bg-gradient-primary h-2 rounded-full transition-all duration-500"
+                className="bg-gradient-primary h-2.5 rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(stepProgress, 100)}%` }}
               />
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Goal: {userProfile?.dailyStepGoal.toLocaleString() || 10000}
             </p>
           </Card>
 
           {/* Distance */}
-          <Card className="bg-gradient-card border-0 shadow-soft p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <Card className="bg-gradient-card border-0 shadow-soft p-5">
+            <div className="flex items-center gap-2.5 mb-3">
               <div className="rounded-xl bg-secondary-light p-2">
-                <TrendingUp className="h-5 w-5 text-secondary" />
+                <TrendingUp className="h-4 w-4 text-secondary" />
               </div>
-              <h3 className="font-semibold">Distance</h3>
+              <h3 className="font-semibold text-sm">Distance</h3>
             </div>
             <p className="text-3xl font-bold mb-2">
               {(todayStats?.totalDistance || 0).toFixed(2)} km
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {todayStats?.sessions.length || 0} sessions
             </p>
           </Card>
 
           {/* Avg Heart Rate */}
-          <Card className="bg-gradient-card border-0 shadow-soft p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <Card className="bg-gradient-card border-0 shadow-soft p-5">
+            <div className="flex items-center gap-2.5 mb-3">
               <div className="rounded-xl bg-destructive/10 p-2">
-                <Heart className="h-5 w-5 text-destructive" />
+                <Heart className="h-4 w-4 text-destructive" />
               </div>
-              <h3 className="font-semibold">Avg Heart Rate</h3>
+              <h3 className="font-semibold text-sm">Avg Heart Rate</h3>
             </div>
             <p className="text-3xl font-bold mb-2">
               {todayStats?.avgHeartRate?.toFixed(0) || '--'} bpm
             </p>
-            <p className="text-sm text-muted-foreground">Resting rate</p>
+            <p className="text-xs text-muted-foreground">Resting rate</p>
           </Card>
         </div>
 
         {/* Live Monitoring */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           <StepCounter />
           <HeartRateMonitor mafResult={mafResult} />
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <Button 
             size="lg" 
-            className="bg-gradient-primary shadow-glow hover:shadow-soft"
+            className="bg-gradient-primary shadow-glow hover:shadow-soft h-14"
             onClick={() => onNavigate('workout')}
           >
             <Activity className="mr-2 h-5 w-5" />
@@ -155,6 +155,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (view: ViewType) => void
           <Button 
             size="lg" 
             variant="outline"
+            className="h-14"
             onClick={() => onNavigate('calendar')}
           >
             <Calendar className="mr-2 h-5 w-5" />
