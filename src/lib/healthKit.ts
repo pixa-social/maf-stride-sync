@@ -32,9 +32,9 @@ class HealthKitService {
     // Check if running on iOS
     if (Capacitor.getPlatform() === 'ios') {
       try {
-        // Check if HealthKit is available (will be set up after native build)
-        // Using dynamic import to avoid build errors when plugin isn't installed
-        const healthModule = await import('@capacitor-community/health').catch(() => null);
+        // Using Function constructor to prevent Vite from analyzing this import
+        const moduleName = '@capacitor-community/health';
+        const healthModule = await new Function('m', 'return import(m)')(moduleName).catch(() => null);
         if (healthModule?.CapacitorHealthKit) {
           this.isAvailable = true;
           console.log('HealthKit available');
@@ -46,6 +46,15 @@ class HealthKitService {
     }
   }
 
+  private async getHealthModule() {
+    try {
+      const moduleName = '@capacitor-community/health';
+      return await new Function('m', 'return import(m)')(moduleName).catch(() => null);
+    } catch {
+      return null;
+    }
+  }
+
   async requestAuthorization(): Promise<boolean> {
     if (!this.isAvailable) {
       console.log('HealthKit not available on this platform');
@@ -53,7 +62,7 @@ class HealthKitService {
     }
 
     try {
-      const healthModule = await import('@capacitor-community/health').catch(() => null);
+      const healthModule = await this.getHealthModule();
       if (!healthModule?.CapacitorHealthKit) return false;
       
       const { CapacitorHealthKit } = healthModule;
@@ -83,7 +92,7 @@ class HealthKitService {
     if (!this.isAvailable) return null;
 
     try {
-      const healthModule = await import('@capacitor-community/health').catch(() => null);
+      const healthModule = await this.getHealthModule();
       if (!healthModule?.CapacitorHealthKit) return null;
       
       const { CapacitorHealthKit } = healthModule;
@@ -109,7 +118,7 @@ class HealthKitService {
     if (!this.isAvailable) return null;
 
     try {
-      const healthModule = await import('@capacitor-community/health').catch(() => null);
+      const healthModule = await this.getHealthModule();
       if (!healthModule?.CapacitorHealthKit) return null;
       
       const { CapacitorHealthKit } = healthModule;
@@ -134,7 +143,7 @@ class HealthKitService {
     if (!this.isAvailable) return null;
 
     try {
-      const healthModule = await import('@capacitor-community/health').catch(() => null);
+      const healthModule = await this.getHealthModule();
       if (!healthModule?.CapacitorHealthKit) return null;
       
       const { CapacitorHealthKit } = healthModule;
@@ -159,7 +168,7 @@ class HealthKitService {
     if (!this.isAvailable) return false;
 
     try {
-      const healthModule = await import('@capacitor-community/health').catch(() => null);
+      const healthModule = await this.getHealthModule();
       if (!healthModule?.CapacitorHealthKit) return false;
       
       const { CapacitorHealthKit } = healthModule;
